@@ -79,7 +79,9 @@ namespace ADO.NetDemo
             }
         }
 
-
+        ///<summary>
+        /// UC3--Update Salary Of Terissa
+        /// </summary>
         public bool UpdateSalary(string empName)
         {
             try
@@ -150,57 +152,60 @@ namespace ADO.NetDemo
             }
         }
 
-        //public void GetAllEmployeesBeforeToday(DateTime date)
-        //{
-        //    EmployeeModel model = new EmployeeModel();
-        //    try
-        //    {
-        //        using (connection)
-        //        {
-        //            string query = @"select * from dbo.employee_payroll where StartDate between CAST(@parameter as date) and CAST(getdate() as date)";
-        //            SqlCommand command = new SqlCommand(query, connection);
-        //            command.Parameters.AddWithValue("@parameter", date);
+        ///<summary>
+        /// UC5--Get All Employees Before Today
+        /// </summary>
+        public void GetAllEmployeesBeforeToday(DateTime date)
+        {
+            EmployeeModel model = new EmployeeModel();
+            try
+            {
+                using (connection)
+                {
+                    string query = @"select * from dbo.employee_payroll where StartDate between CAST(@parameter as date) and CAST(getdate() as date)";
+                    SqlCommand command = new SqlCommand(query, connection);
+                    command.Parameters.AddWithValue("@parameter", date);
 
-        //            connection.Open();
-        //            SqlDataReader reader = command.ExecuteReader();
-        //            if (reader.HasRows)
-        //            {
-        //                while (reader.Read())
-        //                {
-        //                    model.EmpID = reader.GetInt32(0);
-        //                    model.EmployeeName = reader.GetString(1);
-        //                    model.StartDate = reader.GetDateTime(2);
-        //                    model.Gender = reader.GetString(3);
-        //                    model.PhoneNo = reader.GetInt64(4);
-        //                    model.Address = reader.GetString(5);
-        //                    model.Department = reader.GetString(6);
-        //                    model.BasicPay = reader.GetDouble(7);
-        //                    model.Deductions = reader.GetDouble(8);
-        //                    model.TaxablePay = reader.GetDouble(9);
-        //                    model.Tax = reader.GetDouble(10);
-        //                    model.NetPay = reader.GetDouble(11);
+                    connection.Open();
+                    SqlDataReader reader = command.ExecuteReader();
+                    if (reader.HasRows)
+                    {
+                        while (reader.Read())
+                        {
+                            model.EmpID = reader.GetInt32(0);
+                            model.EmployeeName = reader.GetString(1);
+                            model.StartDate = reader.GetDateTime(2);
+                            model.Gender = reader.GetString(3);
+                            model.PhoneNo = reader.GetInt64(4);
+                            model.Address = reader.GetString(5);
+                            model.Department = reader.GetString(6);
+                            model.BasicPay = reader.GetDouble(7);
+                            model.Deductions = reader.GetDouble(8);
+                            model.TaxablePay = reader.GetDouble(9);
+                            model.Tax = reader.GetDouble(10);
+                            model.NetPay = reader.GetDouble(11);
 
-        //                    Console.WriteLine("{0},{1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11}", model.EmpID, model.EmployeeName, model.StartDate, model.Gender, model.PhoneNo, model.Address, model.Department, model.BasicPay, model.Deductions, model.TaxablePay, model.Tax, model.NetPay);
-        //                    Console.WriteLine("\n");
-        //                }
-        //            }
-        //            else
-        //            {
-        //                Console.WriteLine("No data found");
-        //            }
-        //            reader.Close();
-        //            //this.connection.Close();
-        //        }
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        throw new Exception(ex.Message);
-        //    }
-        //    finally
-        //    {
-        //        connection.Close();
-        //    }
-        //}
+                            Console.WriteLine("{0},{1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11}", model.EmpID, model.EmployeeName, model.StartDate, model.Gender, model.PhoneNo, model.Address, model.Department, model.BasicPay, model.Deductions, model.TaxablePay, model.Tax, model.NetPay);
+                            Console.WriteLine("\n");
+                        }
+                    }
+                    else
+                    {
+                        Console.WriteLine("No data found");
+                    }
+                    reader.Close();
+                    //this.connection.Close();
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+            finally
+            {
+                connection.Close();
+            }
+        }
 
         //public void GetTheDetailOfSalaryForPassedGender(string gender)
         //{
