@@ -8,8 +8,8 @@ namespace ADO.NetDemo
         {
             //Console.WriteLine("Hello World!");
             EmployeeRepository repository = new EmployeeRepository();
-            repository.EnsureDataBaseConnection();
-            //repository.GetAllEmployees();
+            //repository.EnsureDataBaseConnection();
+            repository.GetAllEmployees();
 
 
 
