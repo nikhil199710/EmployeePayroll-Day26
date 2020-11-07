@@ -108,47 +108,47 @@ namespace ADO.NetDemo
             }
         }
 
-        ///// <summary>
-        ///// UC4 -- Update the employee payroll data record using a stored procedure
-        ///// </summary>
-        ///// <param name="name"></param>
-        ///// <param name="newBasicPay"></param>
-        ///// <returns></returns>
-        //public bool UpdateEmployeeUsingStoredProcedure(string name, int newBasicPay)
-        //{
-        //    try
-        //    {
-        //        /// Using the connection established
-        //        using (this.connection)
-        //        {
-        //            /// Implementing the stored procedure
-        //            SqlCommand command = new SqlCommand("dbo.spUpdateSalary", this.connection);
-        //            command.CommandType = CommandType.StoredProcedure;
-        //            command.Parameters.AddWithValue("@salary", newBasicPay);
-        //            command.Parameters.AddWithValue("@name", name);
-        //            /// Opening the connection
-        //            this.connection.Open();
-        //            var result = command.ExecuteNonQuery();
-        //            this.connection.Close();
-        //            /// Return the result of the transaction i.e. the dml operation to update data
-        //            if (result != 0)
-        //            {
-        //                //Console.WriteLine("Success");
-        //                return true;
-        //            }
-        //            return false;
-        //        }
-        //    }
-        //    /// Catching any type of exception generated during the run time
-        //    catch (Exception ex)
-        //    {
-        //        throw new Exception(ex.Message);
-        //    }
-        //    finally
-        //    {
-        //        this.connection.Close();
-        //    }
-        //}
+        /// <summary>
+        /// UC4 -- Update the employee payroll data record using a stored procedure
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="newBasicPay"></param>
+        /// <returns></returns>
+        public bool UpdateEmployeeUsingStoredProcedure(string name, int newBasicPay)
+        {
+            try
+            {
+                /// Using the connection established
+                using (this.connection)
+                {
+                    /// Implementing the stored procedure
+                    SqlCommand command = new SqlCommand("dbo.spUpdateSalary", this.connection);
+                    command.CommandType = CommandType.StoredProcedure;
+                    command.Parameters.AddWithValue("@salary", newBasicPay);
+                    command.Parameters.AddWithValue("@name", name);
+                    /// Opening the connection
+                    this.connection.Open();
+                    var result = command.ExecuteNonQuery();
+                    this.connection.Close();
+                    /// Return the result of the transaction i.e. the dml operation to update data
+                    if (result != 0)
+                    {
+                        //Console.WriteLine("Success");
+                        return true;
+                    }
+                    return false;
+                }
+            }
+            /// Catching any type of exception generated during the run time
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+            finally
+            {
+                this.connection.Close();
+            }
+        }
 
         //public void GetAllEmployeesBeforeToday(DateTime date)
         //{
