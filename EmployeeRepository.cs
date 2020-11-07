@@ -15,15 +15,15 @@ namespace ADO.NetDemo
         ///<summary>
         /// UC1--Checking for the validity of the connection
         /// </summary>
-        //public void EnsureDataBaseConnection()
-        //{
-        //    connection.Open();
-        //    using (connection)
-        //    {
-        //        Console.WriteLine("The Connection is created");
-        //    }
-        //    connection.Close();
-        //}
+        public void EnsureDataBaseConnection()
+        {
+            connection.Open();
+            using (connection)
+            {
+                Console.WriteLine("The Connection is created");
+            }
+            connection.Close();
+        }
 
 
         ///<summary>
@@ -80,33 +80,33 @@ namespace ADO.NetDemo
         }
 
 
-        //public bool UpdateSalary(string empName)
-        //{
-        //    try
-        //    {
-        //        using(connection)
-        //        {
-        //            connection.Open();
-        //            string query = @"update dbo.employee_payroll set BasicPay=30000 where EmpName=@parameter";
-        //            SqlCommand command = new SqlCommand(query, this.connection);
-        //            command.Parameters.AddWithValue("@parameter",empName);
-        //            var result = command.ExecuteNonQuery();
-        //            this.connection.Close();
-        //            if (result != 0)
-        //                return true;
-        //            else
-        //                return false;
-        //        }
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        throw new Exception(ex.Message);
-        //    }
-        //    finally
-        //    {
-        //        connection.Close();
-        //    }
-        //}
+        public bool UpdateSalary(string empName)
+        {
+            try
+            {
+                using (connection)
+                {
+                    connection.Open();
+                    string query = @"update dbo.employee_payroll set BasicPay=30000 where EmpName=@parameter";
+                    SqlCommand command = new SqlCommand(query, this.connection);
+                    command.Parameters.AddWithValue("@parameter", empName);
+                    var result = command.ExecuteNonQuery();
+                    this.connection.Close();
+                    if (result != 0)
+                        return true;
+                    else
+                        return false;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+            finally
+            {
+                connection.Close();
+            }
+        }
 
         ///// <summary>
         ///// UC4 -- Update the employee payroll data record using a stored procedure
