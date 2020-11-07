@@ -207,50 +207,54 @@ namespace ADO.NetDemo
             }
         }
 
-        //public void GetTheDetailOfSalaryForPassedGender(string gender)
-        //{
-        //    try
-        //    {
-        //        using (connection)
-        //        {
-        //            connection.Open();
-        //            string query = @"select Gender,count(BasicPay) as EmpCount,min(BasicPay) as MinSalary,max(BasicPay) as MaxSalary,sum(BasicPay) as SalarySum,avg(BasicPay) as AvgSalary from dbo.employee_payroll where Gender=@parameter group by Gender"; 
-        //            SqlCommand command = new SqlCommand(query, this.connection);
-        //            command.Parameters.AddWithValue("@parameter", gender);
-        //            SqlDataReader reader = command.ExecuteReader();
-        //            connection.Close();
-        //            if (reader.HasRows)
-        //            {
-        //                /// Moving to the next record from the table
-        //                /// Mapping the data to the retrieved data from executing the query on the table
-        //                while (reader.Read())
-        //                {
-        //                    int empCount = reader.GetInt32(1);
-        //                    double minSalary = reader.GetDouble(2);
-        //                    double maxSalary = reader.GetDouble(3);
-        //                    double sumOfSalary = reader.GetDouble(4);
-        //                    double avgSalary = reader.GetDouble(5);
-        //                    Console.WriteLine($"Gender:{gender}\nEmployee Count:{empCount}\nMinimum Salary:{minSalary}\nMaximum Salary:{maxSalary}\n" +
-        //                        $"Total Salary for {gender} :{sumOfSalary}\n" + $"Average Salary:{avgSalary}");
-        //                }
-        //            }
-        //            else
-        //            {
-        //                Console.WriteLine("No Data found");
-        //            }
-        //            reader.Close();
-        //        }
-        //    }
-        //    /// Catching any type of exception generated during the run time
-        //    catch (Exception ex)
-        //    {
-        //        throw new Exception(ex.Message);
-        //    }
-        //    finally
-        //    {
-        //        connection.Close();
-        //    }
-        //}
+        ///<summary>
+        /// UC5--Find sum,avg,and other details
+        /// </summary>
+
+        public void GetTheDetailOfSalaryForPassedGender(string gender)
+        {
+            try
+            {
+                using (connection)
+                {
+                    connection.Open();
+                    string query = @"select Gender,count(BasicPay) as EmpCount,min(BasicPay) as MinSalary,max(BasicPay) as MaxSalary,sum(BasicPay) as SalarySum,avg(BasicPay) as AvgSalary from dbo.employee_payroll where Gender=@parameter group by Gender";
+                    SqlCommand command = new SqlCommand(query, this.connection);
+                    command.Parameters.AddWithValue("@parameter", gender);
+                    SqlDataReader reader = command.ExecuteReader();
+                    connection.Close();
+                    if (reader.HasRows)
+                    {
+                        /// Moving to the next record from the table
+                        /// Mapping the data to the retrieved data from executing the query on the table
+                        while (reader.Read())
+                        {
+                            int empCount = reader.GetInt32(1);
+                            double minSalary = reader.GetDouble(2);
+                            double maxSalary = reader.GetDouble(3);
+                            double sumOfSalary = reader.GetDouble(4);
+                            double avgSalary = reader.GetDouble(5);
+                            Console.WriteLine($"Gender:{gender}\nEmployee Count:{empCount}\nMinimum Salary:{minSalary}\nMaximum Salary:{maxSalary}\n" +
+                                $"Total Salary for {gender} :{sumOfSalary}\n" + $"Average Salary:{avgSalary}");
+                        }
+                    }
+                    else
+                    {
+                        Console.WriteLine("No Data found");
+                    }
+                    reader.Close();
+                }
+            }
+            /// Catching any type of exception generated during the run time
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+            finally
+            {
+                connection.Close();
+            }
+        }
     }
 
 
