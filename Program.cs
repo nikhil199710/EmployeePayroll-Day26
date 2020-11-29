@@ -26,7 +26,10 @@ namespace ADO.net
             model.IncomeTax = 4500;
             model.NetPay = 52000;
             Console.WriteLine(employeeRepository.AddEmployee(model) ? "Record inserted successfully " : "Failed");
-
+            
+            //UC3
+            employeeRepository.UpdateSalary("Nikhil");
+            //UC4
             ///Updating the basic pay with given name and employee id
             model.EmpID = 4;
             model.BasicPay = 2000000;
