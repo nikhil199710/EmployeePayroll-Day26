@@ -106,8 +106,37 @@ namespace ADO.net
                 connection.Close();
             }
         }
+        
+        //UC3
+        public bool UpdateSalary(string empName)
+        {
+            try
+            {
+                using (connection)
+                {
+                    connection.Open();
+                    string query = @"update dbo.employee_payroll set BasicPay=30000 where EmpName=@parameter";
+                    SqlCommand command = new SqlCommand(query, this.connection);
+                    command.Parameters.AddWithValue("@parameter", empName);
+                    var result = command.ExecuteNonQuery();
+                    this.connection.Close();
+                    if (result != 0)
+                        return true;
+                    else
+                        return false;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+            finally
+            {
+                connection.Close();
+            }
+        }
         /// <summary>
-        /// UC 3-UC4:
+        /// UC4:
         /// Updates the salary in data base.
         /// </summary>
         /// <param name="model">The employee model.</param>
