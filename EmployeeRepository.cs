@@ -107,7 +107,7 @@ namespace ADO.net
             }
         }
         /// <summary>
-        /// UC 3:
+        /// UC 3-UC4:
         /// Updates the salary in data base.
         /// </summary>
         /// <param name="model">The employee model.</param>
