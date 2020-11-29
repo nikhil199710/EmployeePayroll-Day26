@@ -1,43 +1,32 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
-using System.Data;
-using System.Data.SqlClient;
 using System.Text;
+using System.Data.SqlClient;
 
-namespace ADO.NetDemo
+namespace ADO.net
 {
     public class EmployeeRepository
     {
-        public static string connectionString = @"Server=NIKHIL-ACER\SQLEXPRESS; Initial Catalog =payroll_services; User ID =nikhil; Password=kumar";
+        /// <summary>
+        /// UC 1:
+        /// The connection string which creates the connection between our code and the databse
+        /// </summary>
+        public static string connectionString = @"Server=NIKHIL-ACER\SQLEXPRESS; Initial Catalog =payroll_service; User ID =nikhil; Password=kumar";
         SqlConnection connection = new SqlConnection(connectionString);
-
-
-        ///<summary>
-        /// UC1--Checking for the validity of the connection
+        /// <summary>
+        /// UC 2:
+        /// Gets all the employees from the database.
         /// </summary>
-        public void EnsureDataBaseConnection()
-        {
-            connection.Open();
-            using (connection)
-            {
-                Console.WriteLine("The Connection is created");
-            }
-            connection.Close();
-        }
-
-
-        ///<summary>
-        /// UC2--GetAll Employees
-        /// </summary>
-        public void GetAllEmployees()
+        /// <exception cref="Exception"></exception>
+        public double GetAllEmployees()
         {
             EmployeeModel model = new EmployeeModel();
             try
             {
-                using (connection)
+                using(this.connection)
                 {
                     string query = @"select * from dbo.employee_payroll";
-                    SqlCommand command = new SqlCommand(query, connection);
+                    SqlCommand command = new SqlCommand(query, this.connection);
                     connection.Open();
                     SqlDataReader reader = command.ExecuteReader();
                     if (reader.HasRows)
@@ -45,28 +34,69 @@ namespace ADO.NetDemo
                         while (reader.Read())
                         {
                             model.EmpID = reader.GetInt32(0);
-                            model.EmployeeName = reader.GetString(1);
-                            model.StartDate = reader.GetDateTime(2);
-                            model.Gender = reader.GetString(3);
-                            model.PhoneNo = reader.GetInt64(4);
-                            model.Address = reader.GetString(5);
+                            model.EmpName = reader.GetString(1);
+                            model.BasicPay = reader.GetDouble(2);
+                            model.StartDate = reader.GetDateTime(3);
+                            model.Gender = reader.GetString(4);
+                            model.PhnNo = reader.GetString(5);
                             model.Department = reader.GetString(6);
-                            model.BasicPay = reader.GetDouble(7);
-                            model.Deductions = reader.GetDouble(8);
-                            model.TaxablePay = reader.GetDouble(9);
-                            model.Tax = reader.GetDouble(10);
-                            model.NetPay = reader.GetDouble(11);
-
-                            Console.WriteLine("{0},{1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11}", model.EmpID, model.EmployeeName, model.StartDate, model.Gender, model.PhoneNo, model.Address, model.Department, model.BasicPay, model.Deductions, model.TaxablePay, model.Tax, model.NetPay);
-                            Console.WriteLine("\n");
+                            model.Address = reader.GetString(7);
+                            model.Deductions = reader.GetDecimal(8);
+                            model.TaxablePay = reader.GetDecimal(9);
+                            model.IncomeTax = reader.GetDecimal(10);
+                            model.NetPay = reader.GetDecimal(11);
+                            Console.WriteLine("{0},{1}", model.EmpID,model.EmpName);
+                            return model.BasicPay;
                         }
                     }
                     else
-                    {
                         Console.WriteLine("No data found");
+                    return 0;
+                }
+            }
+            catch(Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+            finally
+            {
+                connection.Close();
+            }
+        }
+        /// <summary>
+        /// UC 2:
+        /// Adds the employee.
+        /// </summary>
+        /// <param name="model">The model.</param>
+        /// <returns></returns>
+        /// <exception cref="Exception"></exception>
+        public bool AddEmployee(EmployeeModel model)
+        {
+            try
+            {
+                using (this.connection)
+                {
+                    SqlCommand command = new SqlCommand("dbo.SpAddEmployeeDetails", this.connection);
+                    command.CommandType = System.Data.CommandType.StoredProcedure;
+                    command.Parameters.AddWithValue("@EmpName", model.EmpName);
+                    command.Parameters.AddWithValue("@BasicPay", model.BasicPay);
+                    command.Parameters.AddWithValue("@StartDate", model.StartDate);
+                    command.Parameters.AddWithValue("@Gender", model.Gender);
+                    command.Parameters.AddWithValue("@PhoneNo", model.PhnNo);
+                    command.Parameters.AddWithValue("@Department", model.Department);
+                    command.Parameters.AddWithValue("@Address", model.Address);
+                    command.Parameters.AddWithValue("@Deductions", model.Deductions);
+                    command.Parameters.AddWithValue("@TaxablePay", model.TaxablePay);
+                    command.Parameters.AddWithValue("@IncomeTax", model.IncomeTax);
+                    command.Parameters.AddWithValue("@NetPay", model.NetPay);
+                    connection.Open();
+                    var result = command.ExecuteNonQuery();
+                    connection.Close();
+                    if (result != 0)
+                    {
+                        return true;
                     }
-                    reader.Close();
-                    //this.connection.Close();
+                    return false;
                 }
             }
             catch (Exception ex)
@@ -78,10 +108,8 @@ namespace ADO.NetDemo
                 connection.Close();
             }
         }
-
-        ///<summary>
-        /// UC3--Update Salary Of Terissa
-        /// </summary>
+        
+        //UC3
         public bool UpdateSalary(string empName)
         {
             try
@@ -110,62 +138,82 @@ namespace ADO.NetDemo
             }
         }
 
+
         /// <summary>
-        /// UC4 -- Update the employee payroll data record using a stored procedure
+        /// UC 4:
+        /// Updates the salary in data base.
         /// </summary>
-        /// <param name="name"></param>
-        /// <param name="newBasicPay"></param>
+        /// <param name="model">The employee model.</param>
         /// <returns></returns>
-        public bool UpdateEmployeeUsingStoredProcedure(string name, int newBasicPay)
+        /// <exception cref="Exception"></exception>
+        public bool UpdateSalary(EmployeeModel model)
         {
             try
             {
-                /// Using the connection established
                 using (this.connection)
                 {
-                    /// Implementing the stored procedure
-                    SqlCommand command = new SqlCommand("dbo.spUpdateSalary", this.connection);
-                    command.CommandType = CommandType.StoredProcedure;
-                    command.Parameters.AddWithValue("@salary", newBasicPay);
-                    command.Parameters.AddWithValue("@name", name);
-                    /// Opening the connection
-                    this.connection.Open();
-                    var result = command.ExecuteNonQuery();
-                    this.connection.Close();
-                    /// Return the result of the transaction i.e. the dml operation to update data
+                    SqlCommand sqlCommand = new SqlCommand("spUpdateSalary", this.connection);
+                    sqlCommand.CommandType = System.Data.CommandType.StoredProcedure;
+                    sqlCommand.Parameters.AddWithValue("@id", model.EmpID);
+                    sqlCommand.Parameters.AddWithValue("@salary", model.BasicPay);
+                    sqlCommand.Parameters.AddWithValue("@name", model.EmpName);
+                    connection.Open();
+                    int result = sqlCommand.ExecuteNonQuery();
+                    connection.Close();
                     if (result != 0)
                     {
-                        //Console.WriteLine("Success");
                         return true;
                     }
                     return false;
                 }
             }
-            /// Catching any type of exception generated during the run time
             catch (Exception ex)
             {
                 throw new Exception(ex.Message);
             }
-            finally
-            {
-                this.connection.Close();
-            }
         }
-
-        ///<summary>
-        /// UC5--Get All Employees Before Today
+        /// <summary>
+        /// Reads the updated salary.
         /// </summary>
-        public void GetAllEmployeesBeforeToday(DateTime date)
+        /// <returns></returns>
+        /// <exception cref="System.Exception">no data found</exception>
+        public double ReadSalary()
+        {
+            public static string connectionString = @"Server=NIKHIL-ACER\SQLEXPRESS; Initial Catalog =payroll_service; User ID =nikhil; Password=kumar";
+            SqlConnection connection = new SqlConnection(connectionString1);
+            double salary;
+            EmployeeModel model = new EmployeeModel();
+            SqlCommand command = new SqlCommand("Select * from employee_payroll", connection);
+            connection.Open();
+            SqlDataReader reader = command.ExecuteReader();
+            if (reader.HasRows)
+            {
+                salary = model.BasicPay;
+            }
+            else
+            {
+                throw new Exception("no data found");
+            }
+            reader.Close();
+            connection.Close();
+            return salary;
+        }
+        
+        
+        /// <summary>
+        /// UC 5:
+        /// Gets all employees from database with given date range.
+        /// </summary>
+        /// <exception cref="System.Exception"></exception>
+        public void GetAllEmployeesFromDate()
         {
             EmployeeModel model = new EmployeeModel();
             try
             {
-                using (connection)
+                using (this.connection)
                 {
-                    string query = @"select * from dbo.employee_payroll where StartDate between CAST(@parameter as date) and CAST(getdate() as date)";
-                    SqlCommand command = new SqlCommand(query, connection);
-                    command.Parameters.AddWithValue("@parameter", date);
-
+                    string query = @"select * from employee_payroll where StartDate between cast('2020-01-01' as date) and cast(getdate() as date)";
+                    SqlCommand command = new SqlCommand(query, this.connection);
                     connection.Open();
                     SqlDataReader reader = command.ExecuteReader();
                     if (reader.HasRows)
@@ -173,28 +221,22 @@ namespace ADO.NetDemo
                         while (reader.Read())
                         {
                             model.EmpID = reader.GetInt32(0);
-                            model.EmployeeName = reader.GetString(1);
-                            model.StartDate = reader.GetDateTime(2);
-                            model.Gender = reader.GetString(3);
-                            model.PhoneNo = reader.GetInt64(4);
-                            model.Address = reader.GetString(5);
+                            model.EmpName = reader.GetString(1);
+                            model.BasicPay = reader.GetDouble(2);
+                            model.StartDate = reader.GetDateTime(3);
+                            model.Gender = reader.GetString(4);
+                            model.PhnNo = reader.GetString(5);
                             model.Department = reader.GetString(6);
-                            model.BasicPay = reader.GetDouble(7);
-                            model.Deductions = reader.GetDouble(8);
-                            model.TaxablePay = reader.GetDouble(9);
-                            model.Tax = reader.GetDouble(10);
-                            model.NetPay = reader.GetDouble(11);
-
-                            Console.WriteLine("{0},{1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11}", model.EmpID, model.EmployeeName, model.StartDate, model.Gender, model.PhoneNo, model.Address, model.Department, model.BasicPay, model.Deductions, model.TaxablePay, model.Tax, model.NetPay);
-                            Console.WriteLine("\n");
+                            model.Address = reader.GetString(7);
+                            model.Deductions = reader.GetDecimal(8);
+                            model.TaxablePay = reader.GetDecimal(9);
+                            model.IncomeTax = reader.GetDecimal(10);
+                            model.NetPay = reader.GetDecimal(11);
+                            Console.WriteLine("{0},{1}", model.EmpID, model.EmpName);
                         }
                     }
                     else
-                    {
                         Console.WriteLine("No data found");
-                    }
-                    reader.Close();
-                    //this.connection.Close();
                 }
             }
             catch (Exception ex)
@@ -206,46 +248,39 @@ namespace ADO.NetDemo
                 connection.Close();
             }
         }
-
-        ///<summary>
-        /// UC5--Find sum,avg,and other details
+        /// <summary>
+        /// UC 6: 
+        /// Implements the database functions like count, min, max, avg, and sum.
         /// </summary>
-
-        public void GetTheDetailOfSalaryForPassedGender(string gender)
+        /// <exception cref="System.Exception"></exception>
+        public void ImplementDatabaseFunctions()
         {
+            EmployeeModel model = new EmployeeModel();
             try
             {
-                using (connection)
+                using (this.connection)
                 {
-                    connection.Open();
-                    string query = @"select Gender,count(BasicPay) as EmpCount,min(BasicPay) as MinSalary,max(BasicPay) as MaxSalary,sum(BasicPay) as SalarySum,avg(BasicPay) as AvgSalary from dbo.employee_payroll where Gender=@parameter group by Gender";
+                    string query = @"select Gender, SUM(BasicPay) as SumOfSalary, MAX(basicPay) as MaxSalary, MIN(BasicPay) as MinSalary, AVG(BasicPay) as AvgSalary, COUNT(BasicPay) as Count from dbo.employee_payroll where Gender='M' or Gender='F' group by Gender";
                     SqlCommand command = new SqlCommand(query, this.connection);
-                    command.Parameters.AddWithValue("@parameter", gender);
+                    connection.Open();
                     SqlDataReader reader = command.ExecuteReader();
-                    connection.Close();
                     if (reader.HasRows)
                     {
-                        /// Moving to the next record from the table
-                        /// Mapping the data to the retrieved data from executing the query on the table
                         while (reader.Read())
                         {
-                            int empCount = reader.GetInt32(1);
-                            double minSalary = reader.GetDouble(2);
-                            double maxSalary = reader.GetDouble(3);
-                            double sumOfSalary = reader.GetDouble(4);
-                            double avgSalary = reader.GetDouble(5);
-                            Console.WriteLine($"Gender:{gender}\nEmployee Count:{empCount}\nMinimum Salary:{minSalary}\nMaximum Salary:{maxSalary}\n" +
-                                $"Total Salary for {gender} :{sumOfSalary}\n" + $"Average Salary:{avgSalary}");
+                            string Gender = reader[0].ToString();
+                            double SumOfSalary = reader.GetDouble(1);
+                            double MaxSalary = reader.GetDouble(2);
+                            double MinSalary = reader.GetDouble(3);
+                            double AvgSalary = reader.GetDouble(4);
+                            int Count = reader.GetInt32(5);
+                            Console.WriteLine("Gender:{0}\tCount:{1}\tMinSalary:{2}\tMaxSalary:{3}\tSumOfSalary:{4}\tAvgSalary:{5}\n",Gender,Count,MinSalary,MaxSalary,SumOfSalary,AvgSalary);
                         }
                     }
                     else
-                    {
-                        Console.WriteLine("No Data found");
-                    }
-                    reader.Close();
+                        Console.WriteLine("No data found");
                 }
             }
-            /// Catching any type of exception generated during the run time
             catch (Exception ex)
             {
                 throw new Exception(ex.Message);
@@ -256,6 +291,4 @@ namespace ADO.NetDemo
             }
         }
     }
-
-
 }
